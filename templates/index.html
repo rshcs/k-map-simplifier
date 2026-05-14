@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K-Map Simplifier</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="container">
+  <h1>K-Map Simplifier</h1>
+  <p class="subtitle">Four-Variable Karnaugh Map (A, B, C, D)</p>
+
+  <div class="main-layout">
+    <div class="input-panel">
+      <div class="kmap-section">
+        <h2>K-Map Grid</h2>
+        <p class="hint">Click cells to toggle: 0 &rarr; 1 &rarr; X (don't care) &rarr; 0</p>
+        <div id="kmap-grid"></div>
+      </div>
+
+      <div class="text-inputs">
+        <div class="input-group">
+          <label for="minterms-input">Minterms (1s):</label>
+          <input type="text" id="minterms-input" placeholder="e.g. 0,1,4,5,12,13">
+        </div>
+        <div class="input-group">
+          <label for="dontcares-input">Don't Cares (Xs):</label>
+          <input type="text" id="dontcares-input" placeholder="e.g. 2,3,10,11">
+        </div>
+      </div>
+
+      <button id="simplify-btn">Simplify</button>
+      <div id="error-msg" class="error hidden"></div>
+    </div>
+
+    <div class="output-panel hidden" id="output-panel">
+      <div class="result-section">
+        <h2>Simplified Expression</h2>
+        <div id="expression" class="expression"></div>
+      </div>
+
+      <div class="result-section">
+        <h2>K-Map with Groups</h2>
+        <div id="kmap-result"></div>
+        <div id="group-legend" class="legend"></div>
+      </div>
+
+      <div class="result-section">
+        <h2>Steps</h2>
+        <div id="steps"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/static/js/script.js"></script>
+</body>
+</html>
