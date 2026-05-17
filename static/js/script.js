@@ -1,3 +1,21 @@
+function termToHtml(term) {
+  if (term === '1' || term === '0') return term;
+  let result = '';
+  for (let i = 0; i < term.length; i++) {
+    if (term[i] === "'") continue;
+    if (i + 1 < term.length && term[i + 1] === "'") {
+      result += `<span class="overline overline-var">${term[i]}</span>`;
+    } else {
+      result += term[i];
+    }
+  }
+  return result;
+}
+
+function expressionToHtml(expr) {
+  return expr.split(/\s*\+\s*/).map(term => termToHtml(term)).join(' <span class="plus">+</span> ');
+}
+
 const COLORS_BG = [
   '#cce5ff', '#d4edda', '#f8d7da', '#e2d5f5',
   '#fff3cd', '#d1ecf1', '#fce4ec', '#e8f5e9'
@@ -69,7 +87,19 @@ function createKmapGrid() {
 function toggleCell(idx) {
   cellStates[idx] = (cellStates[idx] + 1) % 3;
   updateCellDisplay(idx);
-  syncTextInputs();
+  clearGroups();
+  hideResult();
+}
+
+function hideResult() {
+  document.getElementById('expression').classList.add('hidden');
+}
+
+function clearGroups() {
+  document.querySelectorAll('#kmap-grid .kmap-cell').forEach(td => {
+    td.classList.remove('group-0', 'group-1', 'group-2', 'group-3', 'group-4', 'group-5', 'group-6', 'group-7');
+    td.style.boxShadow = '';
+  });
 }
 
 function updateCellDisplay(idx) {
@@ -83,43 +113,12 @@ function updateCellDisplay(idx) {
   valSpan.textContent = val === 0 ? '0' : val === 1 ? '1' : 'x';
 }
 
-function setCellValue(idx, val) {
-  cellStates[idx] = val;
-  updateCellDisplay(idx);
-}
-
-function syncTextInputs() {
-  const minterms = [];
-  const dontcares = [];
-  cellStates.forEach((v, i) => {
-    if (v === 1) minterms.push(i);
-    else if (v === 2) dontcares.push(i);
-  });
-  document.getElementById('minterms-input').value = minterms.join(', ');
-  document.getElementById('dontcares-input').value = dontcares.join(', ');
-}
-
-function syncFromText() {
-  const mintermsStr = document.getElementById('minterms-input').value.trim();
-  const dontcaresStr = document.getElementById('dontcares-input').value.trim();
-
+function resetAll() {
   cellStates.fill(0);
-
-  if (mintermsStr) {
-    mintermsStr.split(/[,\s]+/).filter(s => s.length > 0).forEach(s => {
-      const n = parseInt(s);
-      if (!isNaN(n) && n >= 0 && n <= 15) cellStates[n] = 1;
-    });
-  }
-
-  if (dontcaresStr) {
-    dontcaresStr.split(/[,\s]+/).filter(s => s.length > 0).forEach(s => {
-      const n = parseInt(s);
-      if (!isNaN(n) && n >= 0 && n <= 15) cellStates[n] = 2;
-    });
-  }
-
   for (let i = 0; i < 16; i++) updateCellDisplay(i);
+  clearGroups();
+  hideResult();
+  document.getElementById('group-legend').innerHTML = '';
 }
 
 async function simplify() {
@@ -154,20 +153,15 @@ async function simplify() {
 }
 
 function displayResult(data) {
-  const panel = document.getElementById('output-panel');
-  panel.classList.remove('hidden');
+  const exprEl = document.getElementById('expression');
+  exprEl.innerHTML = 'Q = ' + expressionToHtml(data.expression);
+  exprEl.classList.remove('hidden');
 
-  document.getElementById('expression').textContent = data.expression;
-  renderKmapResult(data.kmap, data.groups);
+  applyGroupsToInputGrid(data.groups);
   renderLegend(data.groups);
-  renderSteps(data.steps);
-  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function renderKmapResult(kmap, groups) {
-  const container = document.getElementById('kmap-result');
-  container.innerHTML = '';
-
+function applyGroupsToInputGrid(groups) {
   const cellGroups = {};
   groups.forEach((g, gi) => {
     g.covers.forEach(idx => {
@@ -176,62 +170,23 @@ function renderKmapResult(kmap, groups) {
     });
   });
 
-  const table = document.createElement('table');
-  table.className = 'kmap-output';
+  const cells = document.querySelectorAll('#kmap-grid .kmap-cell');
+  cells.forEach(td => {
+    const idx = parseInt(td.dataset.index);
 
-  const thead = document.createElement('thead');
-  const hr = document.createElement('tr');
-  const corner = document.createElement('th');
-  corner.className = 'corner';
-  corner.textContent = 'AB\\CD';
-  hr.appendChild(corner);
-  COLS.forEach(c => {
-    const th = document.createElement('th');
-    th.textContent = c;
-    hr.appendChild(th);
+    td.classList.remove('group-0', 'group-1', 'group-2', 'group-3', 'group-4', 'group-5', 'group-6', 'group-7');
+    td.style.boxShadow = '';
+
+    if (cellGroups[idx]) {
+      cellGroups[idx].forEach(gi => {
+        td.classList.add(`group-${gi}`);
+      });
+      const shadows = cellGroups[idx].map((gi, gii) => {
+        return `inset 0 0 0 ${(gii + 1) * 2}px ${COLORS_BORDER[gi % COLORS_BORDER.length]}`;
+      }).join(', ');
+      td.style.boxShadow = shadows;
+    }
   });
-  thead.appendChild(hr);
-  table.appendChild(thead);
-
-  const tbody = document.createElement('tbody');
-  ROWS.forEach(r => {
-    const tr = document.createElement('tr');
-    const rh = document.createElement('th');
-    rh.textContent = r;
-    tr.appendChild(rh);
-    COLS.forEach(c => {
-      const idx = getIndex(r, c);
-      const cell = kmap.find(k => k.index === idx);
-      const td = document.createElement('td');
-      td.className = 'k-cell';
-
-      const ci = document.createElement('span');
-      ci.className = 'ci';
-      ci.textContent = idx;
-
-      const cv = document.createElement('span');
-      cv.className = 'cv';
-      cv.textContent = cell.value === 'x' ? 'X' : cell.value;
-
-      td.appendChild(ci);
-      td.appendChild(cv);
-
-      // Apply group styling
-      if (cellGroups[idx]) {
-        cellGroups[idx].forEach(gi => {
-          td.classList.add(`group-${gi}`);
-        });
-        // Borders for the first group (distinct outlines)
-        const primaryGroup = cellGroups[idx][0];
-        td.classList.add(`group-border-${primaryGroup}`);
-      }
-
-      tr.appendChild(td);
-    });
-    tbody.appendChild(tr);
-  });
-  table.appendChild(tbody);
-  container.appendChild(table);
 }
 
 function renderLegend(groups) {
@@ -249,7 +204,7 @@ function renderLegend(groups) {
     swatch.style.borderColor = COLORS_BORDER[i % COLORS_BORDER.length];
 
     const label = document.createElement('span');
-    label.textContent = `${g.term} = ${g.pattern}  (m${g.covers.join(', m')})`;
+    label.innerHTML = `${termToHtml(g.term)} = ${g.pattern}  (m${g.covers.join(', m')})`;
 
     item.appendChild(swatch);
     item.appendChild(label);
@@ -257,60 +212,9 @@ function renderLegend(groups) {
   });
 }
 
-function renderSteps(steps) {
-  const container = document.getElementById('steps');
-  container.innerHTML = '';
-
-  steps.forEach(s => {
-    const div = document.createElement('div');
-    div.className = 'step';
-
-    const title = document.createElement('div');
-    title.className = 'step-title';
-    title.textContent = s.title;
-    div.appendChild(title);
-
-    const text = document.createElement('div');
-    text.className = 'step-text';
-    text.textContent = s.text;
-    div.appendChild(text);
-
-    if (s.implicants) {
-      const wrap = document.createElement('div');
-      wrap.className = 'step-implicants';
-      s.implicants.forEach(imp => {
-        const span = document.createElement('span');
-        span.className = 'step-implicant';
-        span.textContent = `${imp.term} (${imp.pattern})`;
-        span.title = `Covers m${imp.covers.join(', m')}`;
-        wrap.appendChild(span);
-      });
-      div.appendChild(wrap);
-    }
-
-    if (s.selected) {
-      const wrap = document.createElement('div');
-      wrap.className = 'step-implicants';
-      s.selected.forEach(sel => {
-        const span = document.createElement('span');
-        span.className = 'step-implicant';
-        span.textContent = `${sel.term} (${sel.pattern})`;
-        span.title = `Covers m${sel.covers.join(', m')}`;
-        span.style.background = '#d4edda';
-        span.style.fontWeight = '600';
-        wrap.appendChild(span);
-      });
-      div.appendChild(wrap);
-    }
-
-    container.appendChild(div);
-  });
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   createKmapGrid();
 
-  document.getElementById('minterms-input').addEventListener('input', syncFromText);
-  document.getElementById('dontcares-input').addEventListener('input', syncFromText);
   document.getElementById('simplify-btn').addEventListener('click', simplify);
+  document.getElementById('reset-btn').addEventListener('click', resetAll);
 });
