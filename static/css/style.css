@@ -9,8 +9,9 @@ body {
   background: #0a0a1a;
   color: #c0c0e0;
   line-height: 1.5;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
   display: flex;
   justify-content: center;
   position: relative;
