@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K-Map Simplifier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="scanlines"></div>
+<div class="container">
+  <h1>K-Map Simplifier</h1>
+  <p class="subtitle">Select Number of Variables</p>
+
+  <div class="select-section">
+    <div class="var-card" onclick="location.href='/3var-ab-c'">
+      <div class="card-title">3 Variable AB/C</div>
+      <div class="card-subtitle">4 Rows &times; 2 Columns</div>
+    </div>
+
+    <div class="var-card" onclick="location.href='/3var-a-bc'">
+      <div class="card-title">3 Variable A/BC</div>
+      <div class="card-subtitle">2 Rows &times; 4 Columns</div>
+    </div>
+
+    <div class="var-card" onclick="location.href='/4var'">
+      <div class="card-title">4 Variables</div>
+      <div class="card-subtitle">4 Rows &times; 4 Columns</div>
+    </div>
+  </div>
+
+</div>
+<div class="footer">K-Map Simplifier v0.1.0</div>
+</body>
+</html>
