@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K-Map Simplifier - 4 Variables</title>
+<title>K-Map Simplifier - 3 Variables (AB/C)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -13,7 +13,7 @@
 <div class="scanlines"></div>
 <div class="container">
   <h1>K-Map Simplifier</h1>
-  <p class="subtitle">Four-Variable Karnaugh Map (A, B, C, D)</p>
+  <p class="subtitle">Three-Variable Karnaugh Map (A, B / C)</p>
 
   <div class="back-link">
     <a href="/">&larr; Back to Select</a>
@@ -37,14 +37,15 @@
 <div class="footer">K-Map Simplifier v0.1.0</div>
 <script>
   window.KMAP_CONFIG = {
-    type: '4var',
+    type: '3var-ab-c',
     rows: ['00', '01', '11', '10'],
-    cols: ['00', '01', '11', '10'],
-    cornerLabel: 'AB\\CD',
-    variables: ['A', 'B', 'C', 'D'],
-    cellCount: 16
+    cols: ['0', '1'],
+    cornerLabel: 'AB\\C',
+    variables: ['A', 'B', 'C'],
+    cellCount: 8
   };
 </script>
+<script src="/static/js/solver.js"></script>
 <script src="/static/js/script.js"></script>
 </body>
 </html>

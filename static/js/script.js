@@ -121,7 +121,7 @@ function resetAll() {
   hideResult();
 }
 
-async function simplify() {
+function simplify() {
   const errorEl = document.getElementById('error-msg');
   errorEl.classList.add('hidden');
 
@@ -138,18 +138,8 @@ async function simplify() {
     return;
   }
 
-  try {
-    const resp = await fetch('/simplify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ minterms, dont_cares: dontcares, kmap_type: config.type })
-    });
-    const data = await resp.json();
-    displayResult(data);
-  } catch (err) {
-    errorEl.textContent = 'Error connecting to server.';
-    errorEl.classList.remove('hidden');
-  }
+  const data = KmapSolver.simplify(minterms, dontcares, config.type);
+  displayResult(data);
 }
 
 function displayResult(data) {
