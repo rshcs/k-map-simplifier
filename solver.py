@@ -147,7 +147,7 @@ def simplify(minterms, dont_cares=None):
         groups.append({
             'term': get_term_name(p),
             'pattern': p,
-            'covers': sorted(prime_implicants[p] & actual)
+            'covers': sorted(prime_implicants[p])
         })
 
     steps = []
@@ -164,7 +164,7 @@ def simplify(minterms, dont_cares=None):
         pi_list.append({
             'pattern': p,
             'term': get_term_name(p),
-            'covers': sorted(prime_implicants[p] & actual)
+            'covers': sorted(prime_implicants[p])
         })
     steps.append({'title': 'Prime Implicants', 'text': f'Found {len(prime_implicants)} prime implicant(s)', 'implicants': pi_list})
 
@@ -173,7 +173,7 @@ def simplify(minterms, dont_cares=None):
         sel_list.append({
             'pattern': p,
             'term': get_term_name(p),
-            'covers': sorted(prime_implicants[p] & actual)
+            'covers': sorted(prime_implicants[p])
         })
     steps.append({'title': 'Minimal Cover', 'text': f'Selected {len(selected)} term(s) for minimal expression', 'selected': sel_list})
 

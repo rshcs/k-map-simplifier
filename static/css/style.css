@@ -9,11 +9,11 @@ body {
   background: #0a0a1a;
   color: #c0c0e0;
   line-height: 1.5;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   position: relative;
-  overflow-x: hidden;
 }
 
 body::before {
@@ -51,40 +51,29 @@ body::before {
 .container {
   width: 100%;
   max-width: 540px;
-  margin: 2rem 1rem;
+  margin: 1.5rem 1rem;
   text-align: center;
   position: relative;
   z-index: 2;
 }
 
-@keyframes neonPulse {
-  0%, 100% {
+@keyframes neonFlicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
     text-shadow:
       0 0 10px rgba(0, 243, 255, 0.8),
       0 0 20px rgba(0, 243, 255, 0.4),
-      0 0 40px rgba(0, 243, 255, 0.2);
-    color: #00f3ff;
+      0 0 40px rgba(0, 243, 255, 0.2),
+      0 0 80px rgba(0, 243, 255, 0.1);
   }
-  25% {
+  20%, 24%, 55% {
     text-shadow:
-      0 0 10px rgba(255, 0, 170, 0.8),
-      0 0 20px rgba(255, 0, 170, 0.4),
-      0 0 40px rgba(255, 0, 170, 0.2);
-    color: #ff00aa;
+      0 0 4px rgba(0, 243, 255, 0.4),
+      0 0 8px rgba(0, 243, 255, 0.2);
   }
-  50% {
+  22% {
     text-shadow:
-      0 0 10px rgba(255, 230, 0, 0.8),
-      0 0 20px rgba(255, 230, 0, 0.4),
-      0 0 40px rgba(255, 230, 0, 0.2);
-    color: #ffe600;
-  }
-  75% {
-    text-shadow:
-      0 0 10px rgba(0, 243, 255, 0.8),
-      0 0 20px rgba(0, 243, 255, 0.4),
-      0 0 40px rgba(0, 243, 255, 0.2);
-    color: #00f3ff;
+      0 0 2px rgba(0, 243, 255, 0.2),
+      0 0 4px rgba(0, 243, 255, 0.1);
   }
 }
 
@@ -99,7 +88,7 @@ h1 {
     0 0 40px rgba(0, 243, 255, 0.2);
   letter-spacing: 4px;
   text-transform: uppercase;
-  animation: neonPulse 4s ease-in-out infinite;
+  animation: neonFlicker 3s step-end infinite;
 }
 
 .subtitle {
@@ -157,8 +146,8 @@ h1 {
 }
 
 .kmap-cell {
-  width: 68px;
-  height: 68px;
+  width: 62px;
+  height: 62px;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 400;
