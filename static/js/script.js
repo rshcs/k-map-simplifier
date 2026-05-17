@@ -118,7 +118,6 @@ function resetAll() {
   for (let i = 0; i < 16; i++) updateCellDisplay(i);
   clearGroups();
   hideResult();
-  document.getElementById('group-legend').innerHTML = '';
 }
 
 async function simplify() {
@@ -158,7 +157,6 @@ function displayResult(data) {
   exprEl.classList.remove('hidden');
 
   applyGroupsToInputGrid(data.groups);
-  renderLegend(data.groups);
 }
 
 function applyGroupsToInputGrid(groups) {
@@ -186,29 +184,6 @@ function applyGroupsToInputGrid(groups) {
       }).join(', ');
       td.style.boxShadow = shadows;
     }
-  });
-}
-
-function renderLegend(groups) {
-  const container = document.getElementById('group-legend');
-  container.innerHTML = '';
-  if (groups.length === 0) return;
-
-  groups.forEach((g, i) => {
-    const item = document.createElement('div');
-    item.className = 'legend-item';
-
-    const swatch = document.createElement('span');
-    swatch.className = 'legend-swatch';
-    swatch.style.background = COLORS_BG[i % COLORS_BG.length];
-    swatch.style.borderColor = COLORS_BORDER[i % COLORS_BORDER.length];
-
-    const label = document.createElement('span');
-    label.innerHTML = `${termToHtml(g.term)} = ${g.pattern}  (m${g.covers.join(', m')})`;
-
-    item.appendChild(swatch);
-    item.appendChild(label);
-    container.appendChild(item);
   });
 }
 
