@@ -57,6 +57,37 @@ body::before {
   z-index: 2;
 }
 
+@keyframes neonPulse {
+  0%, 100% {
+    text-shadow:
+      0 0 10px rgba(0, 243, 255, 0.8),
+      0 0 20px rgba(0, 243, 255, 0.4),
+      0 0 40px rgba(0, 243, 255, 0.2);
+    color: #00f3ff;
+  }
+  25% {
+    text-shadow:
+      0 0 10px rgba(255, 0, 170, 0.8),
+      0 0 20px rgba(255, 0, 170, 0.4),
+      0 0 40px rgba(255, 0, 170, 0.2);
+    color: #ff00aa;
+  }
+  50% {
+    text-shadow:
+      0 0 10px rgba(255, 230, 0, 0.8),
+      0 0 20px rgba(255, 230, 0, 0.4),
+      0 0 40px rgba(255, 230, 0, 0.2);
+    color: #ffe600;
+  }
+  75% {
+    text-shadow:
+      0 0 10px rgba(0, 243, 255, 0.8),
+      0 0 20px rgba(0, 243, 255, 0.4),
+      0 0 40px rgba(0, 243, 255, 0.2);
+    color: #00f3ff;
+  }
+}
+
 h1 {
   font-size: 2.2rem;
   font-weight: 400;
@@ -68,6 +99,7 @@ h1 {
     0 0 40px rgba(0, 243, 255, 0.2);
   letter-spacing: 4px;
   text-transform: uppercase;
+  animation: neonPulse 4s ease-in-out infinite;
 }
 
 .subtitle {
@@ -125,10 +157,10 @@ h1 {
 }
 
 .kmap-cell {
-  width: 52px;
-  height: 52px;
+  width: 68px;
+  height: 68px;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 400;
   transition: all 0.15s;
   user-select: none;
@@ -141,16 +173,8 @@ h1 {
   border-color: rgba(0, 243, 255, 0.6);
 }
 
-.kmap-cell .cell-index {
-  font-size: 0.55rem;
-  color: #444477;
-  position: absolute;
-  top: 2px;
-  left: 4px;
-}
-
 .kmap-cell .cell-value {
-  font-size: 1rem;
+  font-size: 1.3rem;
   font-weight: 400;
 }
 

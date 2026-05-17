@@ -65,15 +65,10 @@ function createKmapGrid() {
       td.className = 'kmap-cell val-0';
       td.dataset.index = idx;
 
-      const idxSpan = document.createElement('span');
-      idxSpan.className = 'cell-index';
-      idxSpan.textContent = idx;
-
       const valSpan = document.createElement('span');
       valSpan.className = 'cell-value';
       valSpan.textContent = '0';
 
-      td.appendChild(idxSpan);
       td.appendChild(valSpan);
       td.addEventListener('click', () => toggleCell(idx));
       tr.appendChild(td);
