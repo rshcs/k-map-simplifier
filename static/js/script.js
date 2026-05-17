@@ -17,12 +17,12 @@ function expressionToHtml(expr) {
 }
 
 const COLORS_BG = [
-  '#cce5ff', '#d4edda', '#f8d7da', '#e2d5f5',
-  '#fff3cd', '#d1ecf1', '#fce4ec', '#e8f5e9'
+  '#1a0033', '#001a33', '#33001a', '#003300',
+  '#333300', '#003333', '#330033', '#1a1a00'
 ];
 const COLORS_BORDER = [
-  '#0066cc', '#28a745', '#dc3545', '#7b2d8e',
-  '#d39e00', '#17a2b8', '#e83e8c', '#2e7d32'
+  '#ff00ff', '#00ffff', '#ff0066', '#00ff66',
+  '#ffff00', '#00ffff', '#ff00aa', '#ccff00'
 ];
 
 const ROWS = ['00', '01', '11', '10'];
