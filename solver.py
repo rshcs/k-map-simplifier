@@ -1,26 +1,51 @@
-VARIABLES = ['A', 'B', 'C', 'D']
-N_VARS = 4
-CELL_COUNT = 1 << N_VARS
+def get_config(kmap_type):
+    if kmap_type == '3var-ab-c':
+        return {
+            'variables': ['A', 'B', 'C'],
+            'n_vars': 3,
+            'cell_count': 8,
+            'rows': ['00', '01', '11', '10'],
+            'cols': ['0', '1'],
+            'corner_label': 'AB\\C'
+        }
+    elif kmap_type == '3var-a-bc':
+        return {
+            'variables': ['A', 'B', 'C'],
+            'n_vars': 3,
+            'cell_count': 8,
+            'rows': ['0', '1'],
+            'cols': ['00', '01', '11', '10'],
+            'corner_label': 'A\\BC'
+        }
+    else:
+        return {
+            'variables': ['A', 'B', 'C', 'D'],
+            'n_vars': 4,
+            'cell_count': 16,
+            'rows': ['00', '01', '11', '10'],
+            'cols': ['00', '01', '11', '10'],
+            'corner_label': 'AB\\CD'
+        }
 
 
-def to_bin(n):
-    return format(n, f'0{N_VARS}b')
+def to_bin(n, n_vars):
+    return format(n, f'0{n_vars}b')
 
 
-def get_term_name(pattern):
+def get_term_name(pattern, variables):
     parts = []
     for i, ch in enumerate(pattern):
         if ch == '1':
-            parts.append(VARIABLES[i])
+            parts.append(variables[i])
         elif ch == '0':
-            parts.append(VARIABLES[i] + "'")
+            parts.append(variables[i] + "'")
     return ''.join(parts) if parts else '1'
 
 
-def combine_terms(t1, t2):
+def combine_terms(t1, t2, n_vars):
     diff_idx = None
     result = []
-    for i in range(N_VARS):
+    for i in range(n_vars):
         a, b = t1[i], t2[i]
         if a == '-' and b == '-':
             result.append('-')
@@ -38,12 +63,18 @@ def combine_terms(t1, t2):
     return None
 
 
-def build_kmap(minterms, dont_cares):
-    rows = ['00', '01', '11', '10']
+def build_kmap(minterms, dont_cares, kmap_type):
+    config = get_config(kmap_type)
     kmap = []
-    for r in rows:
-        for c in rows:
-            bits = r + c
+
+    for r in config['rows']:
+        for c in config['cols']:
+            if kmap_type == '3var-ab-c':
+                bits = r + c
+            elif kmap_type == '3var-a-bc':
+                bits = r + c
+            else:
+                bits = r + c
             idx = int(bits, 2)
             if idx in dont_cares:
                 val = 'x'
@@ -53,9 +84,14 @@ def build_kmap(minterms, dont_cares):
     return kmap
 
 
-def simplify(minterms, dont_cares=None):
+def simplify(minterms, dont_cares=None, kmap_type='4var'):
     if dont_cares is None:
         dont_cares = []
+
+    config = get_config(kmap_type)
+    n_vars = config['n_vars']
+    cell_count = config['cell_count']
+    variables = config['variables']
 
     all_terms = sorted(set(minterms + dont_cares))
     actual = set(minterms)
@@ -63,20 +99,21 @@ def simplify(minterms, dont_cares=None):
     if not actual:
         return {
             'expression': '0',
-            'kmap': build_kmap(minterms, dont_cares),
+            'kmap': build_kmap(minterms, dont_cares, kmap_type),
             'steps': [{'title': 'No Minterms', 'text': 'No minterms selected — output is 0'}],
             'groups': []
         }
 
-    if len(actual) == CELL_COUNT:
+    if len(actual) == cell_count:
+        pattern = '-' * n_vars
         return {
             'expression': '1',
-            'kmap': build_kmap(minterms, dont_cares),
+            'kmap': build_kmap(minterms, dont_cares, kmap_type),
             'steps': [{'title': 'All Minterms', 'text': 'All cells are 1 — output is 1'}],
-            'groups': [{'term': '1', 'pattern': '----', 'covers': list(range(CELL_COUNT))}]
+            'groups': [{'term': '1', 'pattern': pattern, 'covers': list(range(cell_count))}]
         }
 
-    current = {to_bin(t): {t} for t in all_terms}
+    current = {to_bin(t, n_vars): {t} for t in all_terms}
     prime_implicants = {}
 
     while current:
@@ -88,7 +125,7 @@ def simplify(minterms, dont_cares=None):
             p1, m1 = items[i]
             for j in range(i + 1, len(items)):
                 p2, m2 = items[j]
-                combined = combine_terms(p1, p2)
+                combined = combine_terms(p1, p2, n_vars)
                 if combined:
                     merged = m1 | m2
                     if combined in next_level:
@@ -107,7 +144,7 @@ def simplify(minterms, dont_cares=None):
     if not prime_implicants:
         return {
             'expression': '0',
-            'kmap': build_kmap(minterms, dont_cares),
+            'kmap': build_kmap(minterms, dont_cares, kmap_type),
             'steps': [],
             'groups': []
         }
@@ -139,20 +176,20 @@ def simplify(minterms, dont_cares=None):
 
     terms = []
     for p in sorted(selected, key=lambda x: (x.count('-'), x)):
-        terms.append(get_term_name(p))
+        terms.append(get_term_name(p, variables))
     expression = ' + '.join(terms)
 
     groups = []
     for p in sorted(selected, key=lambda x: (x.count('-'), x)):
         groups.append({
-            'term': get_term_name(p),
+            'term': get_term_name(p, variables),
             'pattern': p,
             'covers': sorted(prime_implicants[p])
         })
 
     steps = []
 
-    minterm_str = ', '.join(f'm{n}({to_bin(n)})' for n in sorted(minterms))
+    minterm_str = ', '.join(f'm{n}({to_bin(n, n_vars)})' for n in sorted(minterms))
     steps.append({'title': 'Minterms (1s)', 'text': f'Cells set to 1: {minterm_str}'})
 
     if dont_cares:
@@ -163,7 +200,7 @@ def simplify(minterms, dont_cares=None):
     for p in sorted(prime_implicants, key=lambda x: (x.count('-'), x)):
         pi_list.append({
             'pattern': p,
-            'term': get_term_name(p),
+            'term': get_term_name(p, variables),
             'covers': sorted(prime_implicants[p])
         })
     steps.append({'title': 'Prime Implicants', 'text': f'Found {len(prime_implicants)} prime implicant(s)', 'implicants': pi_list})
@@ -172,14 +209,14 @@ def simplify(minterms, dont_cares=None):
     for p in sorted(selected, key=lambda x: (x.count('-'), x)):
         sel_list.append({
             'pattern': p,
-            'term': get_term_name(p),
+            'term': get_term_name(p, variables),
             'covers': sorted(prime_implicants[p])
         })
     steps.append({'title': 'Minimal Cover', 'text': f'Selected {len(selected)} term(s) for minimal expression', 'selected': sel_list})
 
     return {
         'expression': expression,
-        'kmap': build_kmap(minterms, dont_cares),
+        'kmap': build_kmap(minterms, dont_cares, kmap_type),
         'steps': steps,
         'groups': groups
     }

@@ -25,10 +25,16 @@ const COLORS_BORDER = [
   '#ffff00', '#00ffff', '#ff00aa', '#ccff00'
 ];
 
-const ROWS = ['00', '01', '11', '10'];
-const COLS = ['00', '01', '11', '10'];
+let config = window.KMAP_CONFIG || {
+  type: '4var',
+  rows: ['00', '01', '11', '10'],
+  cols: ['00', '01', '11', '10'],
+  cornerLabel: 'AB\\CD',
+  variables: ['A', 'B', 'C', 'D'],
+  cellCount: 16
+};
 
-let cellStates = Array(16).fill(0);
+let cellStates = Array(config.cellCount).fill(0);
 
 function getIndex(row, col) {
   return parseInt(row + col, 2);
@@ -43,9 +49,9 @@ function createKmapGrid() {
   const headerRow = document.createElement('tr');
   const corner = document.createElement('th');
   corner.className = 'corner';
-  corner.textContent = 'AB\\CD';
+  corner.textContent = config.cornerLabel;
   headerRow.appendChild(corner);
-  COLS.forEach(c => {
+  config.cols.forEach(c => {
     const th = document.createElement('th');
     th.textContent = c;
     headerRow.appendChild(th);
@@ -54,12 +60,12 @@ function createKmapGrid() {
   table.appendChild(thead);
 
   const tbody = document.createElement('tbody');
-  ROWS.forEach(r => {
+  config.rows.forEach(r => {
     const tr = document.createElement('tr');
     const rh = document.createElement('th');
     rh.textContent = r;
     tr.appendChild(rh);
-    COLS.forEach(c => {
+    config.cols.forEach(c => {
       const idx = getIndex(r, c);
       const td = document.createElement('td');
       td.className = 'kmap-cell val-0';
@@ -110,7 +116,7 @@ function updateCellDisplay(idx) {
 
 function resetAll() {
   cellStates.fill(0);
-  for (let i = 0; i < 16; i++) updateCellDisplay(i);
+  for (let i = 0; i < config.cellCount; i++) updateCellDisplay(i);
   clearGroups();
   hideResult();
 }
@@ -136,7 +142,7 @@ async function simplify() {
     const resp = await fetch('/simplify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ minterms, dont_cares: dontcares })
+      body: JSON.stringify({ minterms, dont_cares: dontcares, kmap_type: config.type })
     });
     const data = await resp.json();
     displayResult(data);

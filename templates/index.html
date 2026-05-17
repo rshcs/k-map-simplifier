@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>K-Map Simplifier</title>
+<title>K-Map Simplifier - 4 Variables</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -14,6 +14,10 @@
 <div class="container">
   <h1>K-Map Simplifier</h1>
   <p class="subtitle">Four-Variable Karnaugh Map (A, B, C, D)</p>
+
+  <div class="back-link">
+    <a href="/">&larr; Back to Select</a>
+  </div>
 
   <div class="kmap-section">
     <p class="hint">Click cells to toggle: 0 &rarr; 1 &rarr; X (don't care) &rarr; 0</p>
@@ -31,6 +35,16 @@
 
 </div>
 <div class="footer">K-Map Simplifier v0.1.0</div>
+<script>
+  window.KMAP_CONFIG = {
+    type: '4var',
+    rows: ['00', '01', '11', '10'],
+    cols: ['00', '01', '11', '10'],
+    cornerLabel: 'AB\\CD',
+    variables: ['A', 'B', 'C', 'D'],
+    cellCount: 16
+  };
+</script>
 <script src="/static/js/script.js"></script>
 </body>
 </html>
